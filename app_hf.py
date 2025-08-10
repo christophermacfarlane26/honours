@@ -312,14 +312,15 @@ def safe_display_image(dish, image_url, fallback_emoji='🍽️'):
     """
     Safely display an image with fallback to emoji if loading fails.
     This handles cases where external images are blocked by ad blockers or firewalls.
+    All images are displayed with consistent sizing (300px width, 200px height).
     """
     try:
-        # Try to display the image
-        st.image(image_url, width=300, use_container_width=True)
+        # Try to display the image with consistent sizing using HTML for exact control
+        st.markdown(f'<div class="image-container"><img src="{image_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" alt="{dish}"></div>', unsafe_allow_html=True)
         return True
     except Exception as e:
-        # If image fails, display emoji fallback
-        st.markdown(f'<div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">{fallback_emoji}</div>', unsafe_allow_html=True)
+        # If image fails, display emoji fallback with consistent sizing
+        st.markdown(f'<div class="image-container" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 4rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">{fallback_emoji}</div>', unsafe_allow_html=True)
         return False
 
 # Feature generation for ML models
@@ -1289,6 +1290,10 @@ with main_container:
                 border: 2px solid #e9ecef;
                 text-align: center;
                 transition: transform 0.2s ease-in-out;
+                min-height: 500px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
             .product-card:hover {
                 transform: translateY(-2px);
@@ -1320,6 +1325,16 @@ with main_container:
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 margin-bottom: 1rem;
             }
+            .image-container {
+                width: 100%;
+                height: 200px;
+                overflow: hidden;
+                border-radius: 10px;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
             </style>
             """, unsafe_allow_html=True)
             
@@ -1333,7 +1348,7 @@ with main_container:
             for i, dish in enumerate(dish_mappings.keys()):
                 with cols[i % 3]:
                     # Create product card
-                #    st.markdown('<div class="product-card">', unsafe_allow_html=True)
+                    # st.markdown('<div class="product-card">', unsafe_allow_html=True)
                     
                     # Display product image with error handling and fallback emojis
                     if dish in product_images:
@@ -1342,7 +1357,7 @@ with main_container:
                     else:
                         # Use emoji fallback if no image URL found
                         emoji = fallback_images.get(dish, '🍽️')
-                        st.markdown(f'<div style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">{emoji}</div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="image-container" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 4rem; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">{emoji}</div>', unsafe_allow_html=True)
                     
                     # Product title
                     st.markdown(f'<div class="product-title">{dish.replace("_", " ").title()}</div>', unsafe_allow_html=True)
